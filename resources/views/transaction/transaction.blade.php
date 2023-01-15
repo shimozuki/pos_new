@@ -21,21 +21,21 @@
           </button>
         </div>
         <div class="modal-body">
-            <div class="row">
-              <div class="col-12">
-                <div class="alert alert-danger kode_barang_error" role="alert" hidden="">
-                  <i class="mdi mdi-information-outline"></i> Kode barang tidak tersedia
-                </div>
-              </div>
-              <div class="col-12 text-center" id="area-scan">
-              </div>
-              <div class="col-12 barcode-result" hidden="">
-                <h5 class="font-weight-bold">Hasil</h5>
-                <div class="form-border">
-                  <p class="barcode-result-text"></p>
-                </div>
+          <div class="row">
+            <div class="col-12">
+              <div class="alert alert-danger kode_barang_error" role="alert" hidden="">
+                <i class="mdi mdi-information-outline"></i> Kode barang tidak tersedia
               </div>
             </div>
+            <div class="col-12 text-center" id="area-scan">
+            </div>
+            <div class="col-12 barcode-result" hidden="">
+              <h5 class="font-weight-bold">Hasil</h5>
+              <div class="form-border">
+                <p class="barcode-result-text"></p>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="modal-footer" id="btn-scan-action" hidden="">
           <button type="button" class="btn btn-primary btn-sm font-weight-bold rounded-0 btn-continue">Lanjutkan</button>
@@ -58,7 +58,7 @@
             <div class="col-12">
               <div class="form-group">
                 <input type="text" class="form-control" name="search" placeholder="Cari barang">
-              </div>  
+              </div>
             </div>
             <div class="col-12">
               <ul class="list-group product-list">
@@ -147,6 +147,68 @@
                 <tr>
                   <td class="little-td big-td">Kembali</td>
                   <td>Rp. {{ number_format($transaksi->kembali,2,',','.') }}</td>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-sm btn-close-modal" data-dismiss="modal">Tutup</button>
+          <a href="{{ url('/transaction/receipt/' . $message) }}" target="_blank" class="btn btn-sm btn-cetak-pdf">Cetak Struk</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  @endif
+  @if ($message = Session::get('transaction_warning'))
+  <div class="modal fade" id="utangModal" tabindex="-1" role="dialog" aria-labelledby="utangModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-body bg-grey">
+          <div class="row">
+            <div class="col-12 text-center mb-4">
+              <img src="{{ asset('gif/success4.gif') }}">
+              <h4 class="transaction-success-text">Transaksi Berhasil</h4>
+            </div>
+            @php
+            $transaksi = \App\Transaction::where('transactions.kode_transaksi', '=', $message)
+            ->select('transactions.*')
+            ->first();
+            @endphp
+            <div class="col-12">
+              <table class="table-receipt">
+                <tr>
+                  <td>
+                    <span class="d-block little-td">Kode Transaksi</span>
+                    <span class="d-block font-weight-bold">{{ $message }}</span>
+                  </td>
+                  <td>
+                    <span class="d-block little-td">Tanggal</span>
+                    <span class="d-block font-weight-bold">{{ date('d M, Y', strtotime($transaksi->created_at)) }}</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span class="d-block little-td">Kasir</span>
+                    <span class="d-block font-weight-bold">{{ $transaksi->kasir }}</span>
+                  </td>
+                  <td>
+                    <span class="d-block little-td">Total</span>
+                    <span class="d-block font-weight-bold text-success">Rp. {{ number_format($transaksi->total,2,',','.') }}</span>
+                  </td>
+                </tr>
+              </table>
+              <table class="table-summary mt-3">
+                <tr>
+                  <td class="line-td" colspan="2"></td>
+                </tr>
+                <tr>
+                  <td class="little-td big-td">Bayar</td>
+                  <td>Rp. {{ number_format($transaksi->bayar,2,',','.') }}</td>
+                </tr>
+                <tr>
+                  <td class="little-td big-td text-danger">Kekurangan</td>
+                  <td class="text-danger">Rp. {{ number_format($transaksi->kembali,2,',','.') }}</td>
                 </tr>
               </table>
             </div>
@@ -295,141 +357,308 @@
 <script src="{{ asset('plugins/js/quagga.min.js') }}"></script>
 <script src="{{ asset('js/transaction/script.js') }}"></script>
 <script type="text/javascript">
-
-@if ($message = Session::get('transaction_success'))
+  @if($message = Session::get('transaction_success'))
   $('#successModal').modal('show');
-@endif
+  @endif
 
-$(document).on('click', '.btn-pilih', function(e){
-  e.preventDefault();
-  var kode_barang = $(this).prev().prev().children().first().text();
-  $.ajax({
-    url: "{{ url('/transaction/product') }}/" + kode_barang,
-    method: "GET",
-    success:function(response){
-      var check = $('.kode-barang-td:contains('+ response.product.kode_barang +')').length;
-      if(check == 0){
-        tambahData(response.product.kode_barang, response.product.nama_barang, response.product.harga, response.product.stok, response.status);
-      }else{
-        swal(
+  $(document).on('click', '.btn-pilih', function(e) {
+    e.preventDefault();
+    var kode_barang = $(this).prev().prev().children().first().text();
+    $.ajax({
+      url: "{{ url('/transaction/product') }}/" + kode_barang,
+      method: "GET",
+      success: function(response) {
+        var check = $('.kode-barang-td:contains(' + response.product.kode_barang + ')').length;
+        if (check == 0) {
+          tambahData(response.product.kode_barang, response.product.nama_barang, response.product.harga, response.product.stok, response.status);
+        } else {
+          swal(
             "",
             "Barang telah ditambahkan",
             "error"
+          );
+        }
+      }
+    });
+  });
+
+  function startScan() {
+    Quagga.init({
+      inputStream: {
+        name: "Live",
+        type: "LiveStream",
+        target: document.querySelector('#area-scan')
+      },
+      decoder: {
+        readers: ["ean_reader"],
+        multiple: false
+      },
+      locate: false
+    }, function(err) {
+      if (err) {
+        console.log(err);
+        return
+      }
+      console.log("Initialization finished. Ready to start");
+      Quagga.start();
+    });
+
+    Quagga.onDetected(function(data) {
+      $('#area-scan').prop('hidden', true);
+      $('#btn-scan-action').prop('hidden', false);
+      $('.barcode-result').prop('hidden', false);
+      $('.barcode-result-text').html(data.codeResult.code);
+      $('.kode_barang_error').prop('hidden', true);
+      stopScan();
+    });
+  }
+
+  $(document).on('click', '.btn-scan', function() {
+    $('#area-scan').prop('hidden', false);
+    $('#btn-scan-action').prop('hidden', true);
+    $('.barcode-result').prop('hidden', true);
+    $('.barcode-result-text').html('');
+    $('.kode_barang_error').prop('hidden', true);
+    startScan();
+  });
+
+  $(document).on('click', '.btn-repeat', function() {
+    $('#area-scan').prop('hidden', false);
+    $('#btn-scan-action').prop('hidden', true);
+    $('.barcode-result').prop('hidden', true);
+    $('.barcode-result-text').html('');
+    $('.kode_barang_error').prop('hidden', true);
+    startScan();
+  });
+
+  $(document).on('click', '.btn-continue', function(e) {
+    e.stopPropagation();
+    var kode_barang = $('.barcode-result-text').text();
+    $.ajax({
+      url: "{{ url('/transaction/product/check') }}/" + kode_barang,
+      method: "GET",
+      success: function(response) {
+        var check = $('.kode-barang-td:contains(' + response.product.kode_barang + ')').length;
+        if (response.check == 'tersedia') {
+          if (check == 0) {
+            tambahData(response.product.kode_barang, response.product.nama_barang, response.product.harga, response.product.stok, response.status);
+            $('.close-btn').click();
+          } else {
+            swal(
+              "",
+              "Barang telah ditambahkan",
+              "error"
+            );
+          }
+        } else {
+          $('.kode_barang_error').prop('hidden', false);
+        }
+      }
+    });
+  });
+
+  $(document).on('click', '.btn-bayar', function() {
+    var total = parseInt($('.nilai-total2-td').val());
+    var bayar = parseInt($('.bayar-input').val());
+    var check_barang = parseInt($('.jumlah_barang_text').length);
+    if (bayar >= total) {
+      $('.nominal-error').prop('hidden', true);
+      if (check_barang != 0) {
+        if ($('.diskon-input').attr('hidden') != 'hidden') {
+          $('.diskon-input').addClass('is-invalid');
+        } else {
+          $('#transaction_form').submit();
+        }
+      } else {
+        swal(
+          "",
+          "Pesanan Kosong",
+          "error"
+        );
+      }
+    } else if (bayar < total) {
+      $('.nominal-error').prop('hidden', true);
+      if (check_barang != 0) {
+        if ($('.diskon-input').attr('hidden') != 'hidden') {
+          $('.diskon-input').addClass('is-invalid');
+        } else {
+          $('#transaction_form').submit();
+        }
+      } else {
+        swal(
+          "",
+          "Pesanan Kosong",
+          "error"
+        );
+      }
+    } else {
+      if (isNaN(bayar)) {
+        $('.bayar-input').valid();
+      } else {
+        $('.nominal-error').prop('hidden', false);
+      }
+
+      if (check_barang == 0) {
+        swal(
+          "",
+          "Pesanan Kosong",
+          "error"
         );
       }
     }
   });
-});
+  @if($message = Session::get('transaction_warning'))
+  $('#utangModal').modal('show');
+  @endif
 
-function startScan() {
-  Quagga.init({
-    inputStream : {
-      name : "Live",
-      type : "LiveStream",
-      target: document.querySelector('#area-scan')
-    },
-    decoder : {
-      readers : ["ean_reader"],
-      multiple: false
-    },
-    locate: false
-  }, function(err) {
+  $(document).on('click', '.btn-pilih', function(e) {
+    e.preventDefault();
+    var kode_barang = $(this).prev().prev().children().first().text();
+    $.ajax({
+      url: "{{ url('/transaction/product') }}/" + kode_barang,
+      method: "GET",
+      success: function(response) {
+        var check = $('.kode-barang-td:contains(' + response.product.kode_barang + ')').length;
+        if (check == 0) {
+          tambahData(response.product.kode_barang, response.product.nama_barang, response.product.harga, response.product.stok, response.status);
+        } else {
+          swal(
+            "",
+            "Barang telah ditambahkan",
+            "error"
+          );
+        }
+      }
+    });
+  });
+
+  function startScan() {
+    Quagga.init({
+      inputStream: {
+        name: "Live",
+        type: "LiveStream",
+        target: document.querySelector('#area-scan')
+      },
+      decoder: {
+        readers: ["ean_reader"],
+        multiple: false
+      },
+      locate: false
+    }, function(err) {
       if (err) {
-          console.log(err);
-          return
+        console.log(err);
+        return
       }
       console.log("Initialization finished. Ready to start");
       Quagga.start();
-  });
+    });
 
-  Quagga.onDetected(function(data){
-    $('#area-scan').prop('hidden', true);
-    $('#btn-scan-action').prop('hidden', false);
-    $('.barcode-result').prop('hidden', false);
-    $('.barcode-result-text').html(data.codeResult.code);
+    Quagga.onDetected(function(data) {
+      $('#area-scan').prop('hidden', true);
+      $('#btn-scan-action').prop('hidden', false);
+      $('.barcode-result').prop('hidden', false);
+      $('.barcode-result-text').html(data.codeResult.code);
+      $('.kode_barang_error').prop('hidden', true);
+      stopScan();
+    });
+  }
+
+  $(document).on('click', '.btn-scan', function() {
+    $('#area-scan').prop('hidden', false);
+    $('#btn-scan-action').prop('hidden', true);
+    $('.barcode-result').prop('hidden', true);
+    $('.barcode-result-text').html('');
     $('.kode_barang_error').prop('hidden', true);
-    stopScan();
+    startScan();
   });
-}
 
-$(document).on('click', '.btn-scan', function(){
-  $('#area-scan').prop('hidden', false);
-  $('#btn-scan-action').prop('hidden', true);
-  $('.barcode-result').prop('hidden', true);
-  $('.barcode-result-text').html('');
-  $('.kode_barang_error').prop('hidden', true);
-  startScan();
-});
+  $(document).on('click', '.btn-repeat', function() {
+    $('#area-scan').prop('hidden', false);
+    $('#btn-scan-action').prop('hidden', true);
+    $('.barcode-result').prop('hidden', true);
+    $('.barcode-result-text').html('');
+    $('.kode_barang_error').prop('hidden', true);
+    startScan();
+  });
 
-$(document).on('click', '.btn-repeat', function(){
-  $('#area-scan').prop('hidden', false);
-  $('#btn-scan-action').prop('hidden', true);
-  $('.barcode-result').prop('hidden', true);
-  $('.barcode-result-text').html('');
-  $('.kode_barang_error').prop('hidden', true);
-  startScan();
-});
-
-$(document).on('click', '.btn-continue', function(e){
-  e.stopPropagation();
-  var kode_barang = $('.barcode-result-text').text();
-  $.ajax({
-    url: "{{ url('/transaction/product/check') }}/" + kode_barang,
-    method: "GET",
-    success:function(response){
-      var check = $('.kode-barang-td:contains('+ response.product.kode_barang +')').length;
-      if(response.check == 'tersedia'){
-        if(check == 0){
-          tambahData(response.product.kode_barang, response.product.nama_barang, response.product.harga, response.product.stok, response.status);
-          $('.close-btn').click();  
-        }else{
-          swal(
+  $(document).on('click', '.btn-continue', function(e) {
+    e.stopPropagation();
+    var kode_barang = $('.barcode-result-text').text();
+    $.ajax({
+      url: "{{ url('/transaction/product/check') }}/" + kode_barang,
+      method: "GET",
+      success: function(response) {
+        var check = $('.kode-barang-td:contains(' + response.product.kode_barang + ')').length;
+        if (response.check == 'tersedia') {
+          if (check == 0) {
+            tambahData(response.product.kode_barang, response.product.nama_barang, response.product.harga, response.product.stok, response.status);
+            $('.close-btn').click();
+          } else {
+            swal(
               "",
               "Barang telah ditambahkan",
               "error"
-          );
+            );
+          }
+        } else {
+          $('.kode_barang_error').prop('hidden', false);
         }
-      }else{
-        $('.kode_barang_error').prop('hidden', false);
+      }
+    });
+  });
+
+  $(document).on('click', '.btn-bayar', function() {
+    var total = parseInt($('.nilai-total2-td').val());
+    var bayar = parseInt($('.bayar-input').val());
+    var check_barang = parseInt($('.jumlah_barang_text').length);
+    if (bayar >= total) {
+      $('.nominal-error').prop('hidden', true);
+      if (check_barang != 0) {
+        if ($('.diskon-input').attr('hidden') != 'hidden') {
+          $('.diskon-input').addClass('is-invalid');
+        } else {
+          $('#transaction_form').submit();
+        }
+      } else {
+        swal(
+          "",
+          "Pesanan Kosong",
+          "error"
+        );
+      }
+    } else if (bayar < total) {
+      $('.nominal-error').prop('hidden', true);
+      if (check_barang != 0) {
+        if ($('.diskon-input').attr('hidden') != 'hidden') {
+          $('.diskon-input').addClass('is-invalid');
+        } else {
+          $('#transaction_form').submit();
+        }
+      } else {
+        swal(
+          "",
+          "Pesanan Kosong",
+          "error"
+        );
+      }
+    } else {
+      if (isNaN(bayar)) {
+        $('.bayar-input').valid();
+      } else {
+        $('.nominal-error').prop('hidden', false);
+      }
+
+      if (check_barang == 0) {
+        swal(
+          "",
+          "Pesanan Kosong",
+          "error"
+        );
       }
     }
   });
-});
-
-$(document).on('click', '.btn-bayar', function(){
-  var total = parseInt($('.nilai-total2-td').val());
-  var bayar = parseInt($('.bayar-input').val());
-  var check_barang = parseInt($('.jumlah_barang_text').length);
-  if(bayar >= total){
-    $('.nominal-error').prop('hidden', true);
-    if(check_barang != 0){
-      if($('.diskon-input').attr('hidden') != 'hidden'){
-        $('.diskon-input').addClass('is-invalid');
-      }else{
-        $('#transaction_form').submit();
-      }
-    }else{
-      swal(
-          "",
-          "Pesanan Kosong",
-          "error"
-      );
-    }
-  }else{
-    if(isNaN(bayar)) {
-      $('.bayar-input').valid();
-    }else{
-      $('.nominal-error').prop('hidden', false);
-    }
-    
-    if(check_barang == 0){
-      swal(
-          "",
-          "Pesanan Kosong",
-          "error"
-      );
-    }
-  }
-});
+</script>
+<script src="text/javascript">
+  
 </script>
 @endsection

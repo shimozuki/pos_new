@@ -101,6 +101,80 @@
     </div>
   </div>
 </div>
+<div class="row modal-group">
+  <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="{{ url('/transaction/update') }}" method="post" name="update_form">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editModalLabel">Edit Barang</h5>
+            <button type="button" class="close close-btn" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="edit-modal-body">
+              @csrf
+              <div class="row" hidden="">
+                <div class="col-12">
+                  <input type="text" name="id">
+                </div>
+              </div>
+              <div class="form-group row">
+                <label class="col-lg-3 col-md-3 col-sm-12 col-form-label font-weight-bold">Nama</label>
+                <div class="col-lg-9 col-md-9 col-sm-12">
+                  <input type="text" class="form-control" name="kode_barang" readonly>
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-12 offset-lg-3 offset-md-3 error-notice" id="kode_barang_error"></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-lg-3 col-md-3 col-sm-12 col-form-label font-weight-bold">Jumlah Hutang</label>
+                <div class="col-lg-9 col-md-9 col-sm-12">
+                  <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Rp. </span>
+                      </div>
+                      <input type="text" class="form-control number-input input-notzero" name="harga" readonly>
+                  </div>
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-12 offset-lg-3 offset-md-3 error-notice" id="harga_error"></div>
+              </div>
+              <div class="form-group row">
+                <label class="col-lg-3 col-md-3 col-sm-12 col-form-label font-weight-bold">Jumlah Bayar</label>
+                <div class="col-lg-9 col-md-9 col-sm-12">
+                  <div class="input-group">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Rp. </span>
+                      </div>
+                      <input type="text" class="form-control" name="bayar_utang">
+                  </div>
+                </div>
+                <div class="col-lg-9 col-md-9 col-sm-12 offset-lg-3 offset-md-3 error-notice" id="bayar_error"></div>
+              </div>
+          </div>
+          <div class="modal-body" id="scan-modal-body" hidden="">
+            <div class="row">
+              <div class="col-12 text-center" id="area-scan">
+              </div>
+              <div class="col-12 barcode-result" hidden="">
+                <h5 class="font-weight-bold">Hasil</h5>
+                <div class="form-border">
+                  <p class="barcode-result-text"></p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer" id="edit-modal-footer">
+            <button type="submit" class="btn btn-update"><i class="mdi mdi-content-save"></i> Simpan</button>
+          </div>
+          <div class="modal-footer" id="scan-modal-footer" hidden="">
+            <button type="button" class="btn btn-primary btn-sm font-weight-bold rounded-0 btn-continue">Lanjutkan</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm font-weight-bold rounded-0 btn-repeat">Ulangi</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 <div class="row">
   <div class="col-12 mb-4">
     <div class="card card-noborder b-radius">
@@ -179,7 +253,7 @@
                     <th>Total</th>
                     <th>Bayar</th>
                     <th>Kembali</th>
-                    <th></th>
+                    <th>Status</th>
                   </tr>
                   @foreach($transactions as $transaction)
                   <tr>
@@ -201,6 +275,17 @@
                     <td><span class="ammount-box bg-green"><i class="mdi mdi-coin"></i></span>Rp. {{ number_format($transaksi->total,2,',','.') }}</td>
                     <td class="text-success font-weight-bold">- Rp. {{ number_format($transaksi->bayar,2,',','.') }}</td>
                     <td>Rp. {{ number_format($transaksi->kembali,2,',','.') }}</td>
+                    @if ($transaksi->bayar < $transaksi->total)
+                    <td>
+                    <button type="button" class="btn btn-edit btn-danger" data-toggle="modal" data-target="#editModal" data-edit="{{ $transaksi->id }}">
+                    <p class="text-white"> Utang </p>
+                    </button>
+                    </td>
+                    @else
+                    <td>
+                      <p class="text-success"> Lunas </p>
+                    </td>
+                    @endif
                     <td>
                       <button class="btn btn-selengkapnya font-weight-bold" type="button" data-target="#dropdownTransaksi{{ $transaction->kode_transaksi }}"><i class="mdi mdi-chevron-down arrow-view"></i></button>
                     </td>
@@ -364,5 +449,20 @@ $(document).on('click', '.chart-filter', function(e){
     }
   });
 });
+
+$(document).on('click', '.btn-edit', function(){
+    var data_edit = $(this).attr('data-edit');
+    $.ajax({
+      method: "GET",
+      url: "{{ url('/transaction/edit/') }}/" + data_edit,
+      success:function(response)
+      {
+        $('input[name=id]').val(response.product.id);
+        $('input[name=kode_barang]').val(response.product.kode_transaksi);
+        $('input[name=harga]').val(response.product.kembali);
+        validator.resetForm();
+      }
+    });
+  });
 </script>
 @endsection

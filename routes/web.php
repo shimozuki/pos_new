@@ -76,6 +76,8 @@ Route::group(['middleware' => ['auth', 'checkRole:admin,kasir']], function(){
 	Route::get('/transaction/product/check/{id}', 'TransactionManageController@transactionProductCheck');
 	Route::post('/transaction/process', 'TransactionManageController@transactionProcess');
 	Route::get('/transaction/receipt/{id}', 'TransactionManageController@receiptTransaction');
+	Route::get('/transaction/edit/{id}', 'ReportManageController@editUtang');
+	Route::post('/transaction/update', 'ReportManageController@updateUtang');
 	// ------------------------- Kelola Laporan -------------------------
 	Route::get('/report/transaction', 'ReportManageController@reportTransaction');
 	Route::post('/report/transaction/filter', 'ReportManageController@filterTransaction');

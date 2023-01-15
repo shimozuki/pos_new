@@ -47,7 +47,49 @@ class ReportManageController extends Controller
             return back();
         }
     }
+    public function editUtang($id)
+    {
+        $id_account = Auth::id();
+        $check_access = Acces::where('user', $id_account)
+        ->first();
+        if($check_access->transaksi == 1){
+            $product = Transaction::find($id);
 
+            return response()->json(['product' => $product]);
+        }else{
+            return back();
+        }
+    }
+    public function updateUtang(Request $req)
+    {
+        $id_account = Auth::id();
+        $check_access = Acces::where('user', $id_account)
+        ->first();
+        if($check_access->transaksi == 1){
+            $check_product = Transaction::where('kode_transaksi', $req->kode_transaksi)
+            ->count();
+            $product_data = Transaction::find($req->id);
+            if($check_product == 0 || $product_data->kode_transaksi == $req->kode_transaksi)
+            {
+                $product = Transaction::find($req->id);
+                $kode_transaksi = $product->kode_transaksi;
+                $bayar = $product->bayar + $req->bayar_utang;
+                $total = $product->subtotal - $bayar;
+                $product->save();
+
+                Transaction::where('kode_transaksi', $kode_transaksi)
+                ->update(['bayar' => $bayar, 'kembali' => $total]);
+
+                return redirect('/report/transaction');
+            }else{
+                Session::flash('update_failed', 'Kode transaksi tidak ditemukan ');
+
+                return back();
+            }
+        }else{
+            return back();
+        }
+    }
     // Show View Report Worker
     public function reportWorker()
     {
