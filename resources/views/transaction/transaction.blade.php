@@ -437,13 +437,7 @@
           if (check == 0) {
             tambahData(response.product.kode_barang, response.product.nama_barang, response.product.harga, response.product.stok, response.status);
             $('.close-btn').click();
-          } else {
-            swal(
-              "",
-              "Barang telah ditambahkan",
-              "error"
-            );
-          }
+          } 
         } else {
           $('.kode_barang_error').prop('hidden', false);
         }
@@ -515,13 +509,7 @@
         var check = $('.kode-barang-td:contains(' + response.product.kode_barang + ')').length;
         if (check == 0) {
           tambahData(response.product.kode_barang, response.product.nama_barang, response.product.harga, response.product.stok, response.status);
-        } else {
-          swal(
-            "",
-            "Barang telah ditambahkan",
-            "error"
-          );
-        }
+        } 
       }
     });
   });
@@ -587,13 +575,7 @@
           if (check == 0) {
             tambahData(response.product.kode_barang, response.product.nama_barang, response.product.harga, response.product.stok, response.status);
             $('.close-btn').click();
-          } else {
-            swal(
-              "",
-              "Barang telah ditambahkan",
-              "error"
-            );
-          }
+          } 
         } else {
           $('.kode_barang_error').prop('hidden', false);
         }
