@@ -129,12 +129,15 @@
           <div class="col-12 text-center">
             <p class="m-0">Total Pemasukan</p>
             <h2 class="font-weight-bold">Rp. {{ number_format($all_incomes,2,',','.') }}</h2>
-            <p class="m-0 txt-light">{{ date('d M, Y', strtotime($min_date)) }} - {{ date('d M, Y', strtotime($max_date)) }}</p>
+            @php 
+            $total = $pengeluaran * $stok;
+            $laba_rugi = $total - $all_incomes;
+            @endphp
           </div>
-          <div class="col-12 text-center mt-4">
-            <div class="btn-view-all">
-              <i class="mdi mdi-chevron-down"></i>
-            </div>
+          <div class="col-12 text-center">
+            <p class="m-0">Laba Rugi</p>
+            <h2 class="font-weight-bold">Rp. {{ number_format($laba_rugi,2,',','.') }}</h2>
+            <p class="m-0 txt-light">{{ date('d M, Y', strtotime($min_date)) }} - {{ date('d M, Y', strtotime($max_date)) }}</p>
           </div>
           <div class="col-12">
             <hr>

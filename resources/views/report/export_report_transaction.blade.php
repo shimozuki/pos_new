@@ -1,135 +1,172 @@
 <!DOCTYPE html>
 <html>
+
 <head>
 	<title>Laporan Pemasukan ({{ date('d M, Y', strtotime($tgl_awal)) . ' - ' . date('d M, Y', strtotime($tgl_akhir))}})</title>
 	<style type="text/css">
-		html{
+		html {
 			font-family: "Arial", sans-serif;
 			margin: 0;
 			padding: 0;
 		}
-		.header{
+
+		.header {
 			background-color: #d3eafc;
 			padding: 60px 90px;
 		}
-		.body{
+
+		.body {
 			padding: 40px 90px;
 		}
+
 		/* Text */
-		.text-20{
+		.text-20 {
 			font-size: 20px;
 		}
-		.text-18{
+
+		.text-18 {
 			font-size: 18px;
 		}
-		.text-16{
+
+		.text-16 {
 			font-size: 16px;
 		}
-		.text-14{
+
+		.text-14 {
 			font-size: 14px;
 		}
-		.text-12{
+
+		.text-12 {
 			font-size: 12px;
 		}
-		.text-10{
+
+		.text-10 {
 			font-size: 10px;
 		}
-		.font-bold{
+
+		.font-bold {
 			font-weight: bold;
 		}
-		.text-left{
+
+		.text-left {
 			text-align: left;
 		}
-		.text-right{
+
+		.text-right {
 			text-align: right;
 		}
-		.txt-dark{
+
+		.txt-dark {
 			color: #5b5b5b;
 		}
-		.txt-dark2{
+
+		.txt-dark2 {
 			color: #1d1d1d;
 		}
-		.txt-blue{
+
+		.txt-blue {
 			color: #2a4df1;
 		}
-		.txt-light{
+
+		.txt-light {
 			color: #acacac;
 		}
-		.txt-green{
+
+		.txt-green {
 			color: #19d895;
 		}
-		p{
+
+		p {
 			margin: 0;
 		}
 
-		.d-block{
+		.d-block {
 			display: block;
 		}
-		.w-100{
+
+		.w-100 {
 			width: 100%;
 		}
-		.img-td{
+
+		.img-td {
 			width: 60px;
 		}
-		.img-td img{
+
+		.img-td img {
 			width: 3rem;
 		}
-		.mt-2{
+
+		.mt-2 {
 			margin-top: 10px;
 		}
-		.mb-1{
+
+		.mb-1 {
 			margin-bottom: 5px;
 		}
-		.mb-4{
+
+		.mb-4 {
 			margin-bottom: 20px;
 		}
-		.pt-30{
+
+		.pt-30 {
 			padding-top: 30px;
 		}
-		.pt-15{
+
+		.pt-15 {
 			padding-top: 15px;
 		}
-		.pt-5{
+
+		.pt-5 {
 			padding-top: 5px;
 		}
-		.pb-5{
+
+		.pb-5 {
 			padding-bottom: 5px;
 		}
-		table{
+
+		table {
 			border-collapse: collapse;
 		}
-		thead tr td{
+
+		thead tr td {
 			border-bottom: 0.5px solid #d9dbe4;
 			color: #7e94f6;
 			font-size: 12px;
 			padding: 5px;
 			text-transform: uppercase;
 		}
-		tbody tr td{
+
+		tbody tr td {
 			padding: 7px;
 		}
-		.border-top-foot{
+
+		.border-top-foot {
 			border-top: 0.5px solid #d9dbe4;
 		}
-		.mr-20{
+
+		.mr-20 {
 			margin-right: 20px;
 		}
-		ul{
+
+		ul {
 			padding: 0;
 		}
-		ul li{
+
+		ul li {
 			list-style-type: none;
 		}
-		.w-300p{
+
+		.w-300p {
 			width: 300px;
 		}
 	</style>
 </head>
+
 <body>
 	<div class="header">
 		<table class="w-100">
 			<tr>
-				<td class="img-td text-left"> <img src="{{ asset('icons/jassicon_r.png') }}" alt="logo" /></td>
+				<td class="img-td text-left"><img src="{{ asset('icons/jassicon_r.png') }}"></td>
 				<td class="text-left">
 					<p class="text-12 txt-dark d-block mb-1">{{ $market->nama_toko }}</p>
 					<p class="text-10 txt-dark d-block">{{ $market->alamat }}</p>
@@ -218,4 +255,5 @@
 		</table>
 	</div>
 </body>
+
 </html>

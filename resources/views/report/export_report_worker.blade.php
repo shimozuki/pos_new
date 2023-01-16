@@ -236,8 +236,8 @@
 				</tr>
 				<tr>
 					<td class="text-14 pt-15 text-right">
-						<span class="mr-20">JUMLAH AKTIVITAS</span>
-						<span class="txt-blue font-bold">{{ $jml_aktv_pengeluaran }}</span>
+						<span class="mr-20">JUMLAH PENGELUARAN</span>
+						<span class="txt-blue font-bold">Rp. {{ number_format($pengeluaran,2,',','.') }}</span>
 					</td>
 				</tr>
 			</tfoot>

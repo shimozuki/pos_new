@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use Session;
 use Carbon\Carbon;
 use App\Market;
+use App\Product;
 use App\Transaction;
 use Illuminate\Http\Request;
+use Psy\Readline\Transient;
+use Illuminate\Support\Facades\DB;
 
 class ViewManageController extends Controller
 {
@@ -55,12 +58,15 @@ class ViewManageController extends Controller
             $transaksi_daily = Transaction::where('kode_transaksi', $kode->kode_transaksi)->first();
             $incomes_daily += $transaksi_daily->total;
         }
+        $pengeluaran = Product::join('supplies', 'products.kode_barang', '=', 'supplies.kode_barang')->sum('supplies.harga_beli');
+        $stok = Product::join('supplies', 'products.kode_barang', '=', 'supplies.kode_barang')->sum('supplies.jumlah');
         $customers_daily = count($kode_transaksi_dis_daily);
         $min_date = Transaction::min('created_at');
         $max_date = Transaction::max('created_at');
         $market = Market::first();
 
-    	return view('dashboard', compact('kd_transaction', 'incomes', 'incomes_daily', 'customers_daily', 'all_incomes', 'min_date', 'max_date', 'market'));
+
+    	return view('dashboard', compact('stok', 'pengeluaran', 'kd_transaction', 'incomes', 'incomes_daily', 'customers_daily', 'all_incomes', 'min_date', 'max_date', 'market'));
     }
 
     // Filter Chart Dashboard
